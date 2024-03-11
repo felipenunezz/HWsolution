@@ -50,6 +50,7 @@ Status add_hours(Time* time, int hours) {
             time->hours += hours;
             return convert(time);
     }
+    return ERROR;
 }
 Status add_minutes(Time* time, int minutes) {
     if (check(time) == SUCCESS) {
