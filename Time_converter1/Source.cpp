@@ -47,11 +47,10 @@ Status convert(Time* time) {
 
 Status add_hours(Time* time, int hours) {
     if (check(time) == SUCCESS) {
-        if (time->hours + hours <= 24) {
-            time->hours = time->hours + hours;
-        }
-        else { return WARNING; }
+            time->hours += hours;
+            return convert(time);
     }
+    return ERROR;
 }
 Status add_minutes(Time* time, int minutes) {
     if (check(time) == SUCCESS) {
@@ -62,16 +61,11 @@ Status add_minutes(Time* time, int minutes) {
 }
 Status add_seconds(Time* time, int seconds) {
     if (check(time) == SUCCESS) {
-        if (time->seconds + seconds <= 60) {
             time->seconds += seconds;
-        }
-        else { return WARNING; }
+            return convert(time);
     }
-    convert(time);
-    return SUCCESS;
-
+    return ERROR;
 }
-
 
 int compare(const Time* time1, const Time* time2) {
     int second1 = (time1->hours * 3600) + (time1->minutes * 60) + time1->seconds;
