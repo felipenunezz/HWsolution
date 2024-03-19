@@ -53,14 +53,14 @@ public:
     const char* _data() const;
 
     void swap(CString& str);
-    size_t copy(char* buf, size_t len, size_t pos) const;
+    //size_t copy(char* buf, size_t len, size_t pos) const;
     CString substr(size_t pos, size_t len) const;
 
-    CString& assign(const CString& str);
-    CString& assign(const CString& str, size_t pos, size_t len);
-    CString& assign(const char* s);
-    CString& assign(const char* s, size_t n);
-    CString& assign(size_t n, char c);
+    //CString& assign(const CString& str);
+    //CString& assign(const CString& str, size_t pos, size_t len);
+    //CString& assign(const char* s);
+    //CString& assign(const char* s, size_t n);
+    //CString& assign(size_t n, char c);
 
     int compare(const CString& str) const noexcept;
     int compare(size_t pos, size_t len, const CString& str) const;
@@ -71,9 +71,9 @@ public:
 
     void clear() noexcept;                   
     void resize(size_t n);    
-    void reserve(size_t n);             
+    //void reserve(size_t n);             
 
-    void push_back(char c);                   
+   /* void push_back(char c); */                  
     void pop_back();                      
 
     CString& erase(size_t pos, size_t len);    
@@ -95,19 +95,19 @@ public:
     CString& replace(size_t pos, size_t len, const char* s, size_t n);
     CString& replace(size_t pos, size_t len, size_t n, char c);
 
-    size_t find(const CString& str) const;
-    size_t find(const char* s) const;
-    size_t find(const char* s, size_t n) const;
-    size_t find(char c) const;
+    size_t find(const CString& str, size_t pos) const;
+    //size_t find(const char* s, size_t pos) const;
+    //size_t find(const char* s, size_t pos, size_t n) const;
+    //size_t find(char c, size_t pos) const;
 
-    size_t find_first_of(const CString& str) const;
-    //size_t find_first_of(const char* s) const;
-    //size_t find_first_of(const char* s, size_t n) const;
-    //size_t find_first_of(char c) const;
+    size_t find_first_of(const CString& str, size_t pos) const;
+    //size_t find_first_of(const char* s, size_t pos) const;
+    //size_t find_first_of(const char* s, size_t pos, size_t n) const;
+    //size_t find_first_of(char c, size_t pos) const;
 
-    //size_t find_first_not_of(const CString& str) const;
-    //size_t find_first_not_of(const char* s) const;
-    //size_t find_first_not_of(const char* s, size_t n) const;
-    //size_t find_first_not_of(char c) const;
+    //size_t find_first_not_of(const CString& str, size_t pos) const;
+    //size_t find_first_not_of(const char* s, size_t pos) const;
+    //size_t find_first_not_of(const char* s, size_t pos, size_t n) const;
+    //size_t find_first_not_of(char c, size_t pos) const;
 };
 

@@ -82,12 +82,12 @@ void CString::swap(CString& str)
     capacity = temp._capacity();
     for (size_t i = 0; i < size; i++) { data[i] = temp._data()[i]; }
 }
-size_t CString::copy (char* buf, size_t len, size_t pos) const 
-{
-    if (len + pos > size) { throw std::invalid_argument("unmatching size for CString imput");}
-    for (size_t i = 0; i < len; i++) { buf[i] = data[pos + i]; }
-    return len;
-}
+//size_t CString::copy (char* buf, size_t len, size_t pos) const 
+//{
+//    if (len + pos > size) { throw std::invalid_argument("unmatching size for CString imput");}
+//
+//
+//}
 CString CString::substr(size_t pos, size_t len) const {
     if (len + pos > size) { throw std::invalid_argument("unmatching size for CString imput");}
 
@@ -103,56 +103,11 @@ CString CString::substr(size_t pos, size_t len) const {
     return SubTemp;
 }
 
-CString& CString::assign(const CString& str) 
-{
-    size = str.size;
-    capacity = str.capacity;
-    data = new char[capacity];
-    for (size_t i = 0; i < size; i++) { data[i] = str.data[i]; }
-    data[size] = '\0';
-    return *this;
-}
-CString& CString::assign(const CString& str, size_t pos, size_t len) 
-{
-    size = 0;
-    while (c_str[size] != '\0') { size++; }
-    capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
-    data = new char[capacity];
-    for (size_t i = 0; i < size; i++) { data[i] = c_str[i]; }
-    data[size] = '\0';
-    return *this;
-}
-CString& CString::assign(const char* s) 
-{
-    size = 0;
-    while (c_str[size] != '\0') { size++; }
-    if (size < n) throw std::invalid_argument("Incorrect Input");
-    size = n;
-    capacity = (n / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
-    data = new char[capacity];
-    for (size_t i = 0; i < n; i++) { data[i] = c_str[i]; }
-    data[n] = '\0';
-    return *this;
-}
-CString& CString::assign(const char* s, size_t n) 
-{
-    size = n;
-    capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
-    data = new char[capacity];
-    for (size_t i = 0; i < size; i++) { data[i] = c; }
-    data[size] = '\0';
-    return *this;
-}
-CString& CString::assign(size_t n, char c) 
-{
-    if (len + pos > str.size) { throw std::invalid_argument("unmatching size for CString imput"); }
-    size = len;
-    capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
-    data = new char[capacity];
-    for (size_t i = 0; i < size; i++) { data[i] = str.data[pos + i]; }
-    data[size] = '\0';
-    return *this;
-}
+//CString& CString::assign(const CString& str) {}
+//CString& CString::assign(const CString& str, size_t pos, size_t len) {}
+//CString& CString::assign(const char* s) {}
+//CString& CString::assign(const char* s, size_t n) {}
+//CString& CString::assign(size_t n, char c) {}
 
 int CString::compare(const CString& str) const noexcept 
 {
@@ -237,25 +192,15 @@ void CString::resize(size_t n)
     if (size > tempS) { for (size_t i = tempS; i < size; i++) { data[i] = ' '; } }
     data[size] = '\0';
 }
-void CString::reserve(size_t n) 
-{
-    if (n > size) 
-    {
-        capacity = (n / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
-    }
-    else 
-    {
-        throw std::invalid_argument("The sated value is too small.");
-    }   
-}
+//void CString::reserve(size_t n) { /*idk what this does*/ } // change capacity +- with saved data;!!!
 
-void CString::push_back(char c) 
-{
-    if (this->full()) { this->reserve(capacity); }
-
-    data[size] = c;
-    data[++size] = '\0';
-}
+//void CString::push_back(char c) 
+//{
+//    if (this->full()) { this->reserve(capacity); }
+//
+//    data[size] = c;
+//    data[++size] = '\0';
+//}
 void CString::pop_back() 
 {
     if (this->empty()) 
@@ -425,9 +370,8 @@ CString& CString::replace(size_t pos, size_t len, size_t n, char c) {
     return *this;
 }
 
-size_t CString::find(const CString& str) const 
-{   
-    size_t pos = 0;
+size_t CString::find(const CString& str, size_t pos) const 
+{ 
     if (str.empty()) { throw std::invalid_argument("The CString data is empty"); }
     for (size_t i = 0, j = 0; i < size && j < str.size;) {
         if (data[i] == str.data[j])
@@ -441,54 +385,24 @@ size_t CString::find(const CString& str) const
     return pos;
     
 }
-size_t CString::find(const char* s) const 
-{
-    size_t pos = 0;
-    size_t ssize;
-    while (s[ssize] != '\0') { ssize++; }
+//size_t CString::find(const char* s, size_t pos) const 
+//{
+//
+//}
+//size_t CString::find(const char* s, size_t pos, size_t n) const 
+//{
+//
+//}
+//size_t CString::find(char c, size_t pos) const 
+//{
+//    for (size_t i = 0; i < size; i++) {
+//        if (data[i] == c) pos = i;
+//    }
+//    return pos;
+//}
 
-    
-    for (size_t i = 0, j = 0; i < size && j < ssize;) {
-        if (data[i] == s[j])
-        {
-            if (j == 0) pos = i;
-            j++; i++;
-
-        }
-        else { j = 0; i++; }
-    }
-    return pos;
-}
-size_t CString::find(const char* s, size_t n) const 
-{
-    size_t pos = 0;
-    size_t ssize;
-    while (s[ssize] != '\0') { ssize++; }
-    if (n > ssize) throw std::invalid_argument("Incorrect imput");
-    ssize = n;
-
-    for (size_t i = 0, j = 0; i < size && j < n;) {
-        if (data[i] == s[j])
-        {
-            if (j == 0) pos = i;
-            j++; i++;
-
-        }
-        else { j = 0; i++; }
-    }
-    return pos;
-}
-size_t CString::find(char c) const 
-{
-    size_t pos = 0;
-    for (size_t i = 0; i < size; i++) {
-        if (data[i] == c) pos = i;
-    }
-    return pos;
-}
-
-size_t CString::find_first_of(const CString& str) const {
-    for (size_t i = 0; i < size; i++) {
+size_t CString::find_first_of(const CString& str, size_t pos) const {
+    for (size_t i = pos; i < size; i++) {
         for (size_t j = 0; j < str.size; j++) {
             if (data[i] == str.data[j]) {
                 return i;
