@@ -101,13 +101,13 @@ public:
     size_t find(char c) const;
 
     size_t find_first_of(const CString& str) const;
-    //size_t find_first_of(const char* s) const;
-    //size_t find_first_of(const char* s, size_t n) const;
-    //size_t find_first_of(char c) const;
+    size_t find_first_of(const char* s) const;
+    size_t find_first_of(const char* s, size_t n) const;
+    size_t find_first_of(char c) const;
 
-    //size_t find_first_not_of(const CString& str) const;
-    //size_t find_first_not_of(const char* s) const;
-    //size_t find_first_not_of(const char* s, size_t n) const;
-    //size_t find_first_not_of(char c) const;
+    size_t find_first_not_of(const CString& str) const;
+    size_t find_first_not_of(const char* s) const;
+    size_t find_first_not_of(const char* s, size_t n) const;
+    size_t find_first_not_of(char c) const;
 };
 

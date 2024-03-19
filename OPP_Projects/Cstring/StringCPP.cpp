@@ -9,30 +9,36 @@ CString::CString()
 }
 CString::CString(const CString& str) 
 {
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
+    
     size = str.size;
     capacity = str.capacity;
     data = new char[capacity];
-    for (size_t i = 0; i < size; i++) { data[i] = str.data[i]; }
+    
+    for (size_t i = 0; i < size; i++) data[i] = str.data[i];
     data[size] = '\0';
 }
 CString::CString(const char* c_str)
 {
     size = 0;
-    while (c_str[size] != '\0') { size++; }
+    while (c_str[size] != '\0') size++;
     capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     data = new char[capacity];
-    for (size_t i = 0; i < size; i++) { data[i] = c_str[i]; }
+    
+    for (size_t i = 0; i < size; i++) data[i] = c_str[i];
     data[size] = '\0';
 }
 CString::CString(const char* c_str, size_t n)
 {
     size = 0;
-    while (c_str[size] != '\0') { size++; }
+    while (c_str[size] != '\0') size++;
     if (size < n) throw std::invalid_argument("Incorrect Input");
+    
     size = n;
     capacity = (n / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     data = new char[capacity];
-    for (size_t i = 0; i < n; i++) { data[i] = c_str[i]; }
+    
+    for (size_t i = 0; i < n; i++) data[i] = c_str[i];
     data[n] = '\0';
 
 }
@@ -41,15 +47,19 @@ CString::CString(size_t n, char c)
     size = n; 
     capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     data = new char[capacity];
-    for (size_t i = 0; i < size; i++) { data[i] = c; }
+    
+    for (size_t i = 0; i < size; i++) data[i] = c;
     data[size] = '\0';
 }
 CString::CString(const CString& str, size_t pos, size_t len) 
 {
-    if (len + pos > str.size) { throw std::invalid_argument("unmatching size for CString imput"); }
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
+    if (len + pos > str.size) throw std::invalid_argument("unmatching size for CString imput");
+    
     size = len;
     capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     data = new char[capacity];
+    
     for (size_t i = 0; i < size; i++) { data[i] = str.data[pos + i]; }
     data[size] = '\0';
 }
@@ -80,22 +90,23 @@ void CString::swap(CString& str)
      
     size = temp._size();
     capacity = temp._capacity();
-    for (size_t i = 0; i < size; i++) { data[i] = temp._data()[i]; }
+    for (size_t i = 0; i < size; i++) data[i] = temp._data()[i];
 }
 size_t CString::copy (char* buf, size_t len, size_t pos) const 
 {
-    if (len + pos > size) { throw std::invalid_argument("unmatching size for CString imput");}
-    for (size_t i = 0; i < len; i++) { buf[i] = data[pos + i]; }
+    if (len + pos > size) throw std::invalid_argument("unmatching size for CString imput");
+    for (size_t i = 0; i < len; i++) buf[i] = data[pos + i];
     return len;
 }
-CString CString::substr(size_t pos, size_t len) const {
+CString CString::substr(size_t pos, size_t len) const 
+{
     if (len + pos > size) { throw std::invalid_argument("unmatching size for CString imput");}
 
     CString SubTemp;
     SubTemp.size = size;
     SubTemp.capacity = (SubTemp.size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
 
-    for (size_t i = 0; i < size; i++) { if (i >= pos && i <= pos + len) { SubTemp.data[i] = data[i]; } }
+    for (size_t i = 0; i < size; i++) if (i >= pos && i <= pos + len) SubTemp.data[i] = data[i];
     SubTemp.size = len;
     SubTemp.capacity = (SubTemp.size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     SubTemp.data[SubTemp.size] = '\0';
@@ -105,52 +116,66 @@ CString CString::substr(size_t pos, size_t len) const {
 
 CString& CString::assign(const CString& str) 
 {
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
+    
     size = str.size;
     capacity = str.capacity;
     data = new char[capacity];
+    
     for (size_t i = 0; i < size; i++) { data[i] = str.data[i]; }
     data[size] = '\0';
+    
     return *this;
 }
 CString& CString::assign(const CString& str, size_t pos, size_t len) 
 {
-    size = 0;
-    while (c_str[size] != '\0') { size++; }
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
+    if (len + pos > str.size) throw std::invalid_argument("unmatching size for CString imput");
+    
+    size = len;
     capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     data = new char[capacity];
-    for (size_t i = 0; i < size; i++) { data[i] = c_str[i]; }
+    
+    for (size_t i = 0; i < size; i++) { data[i] = str.data[pos + i]; }
     data[size] = '\0';
+    
     return *this;
 }
 CString& CString::assign(const char* s) 
 {
     size = 0;
-    while (c_str[size] != '\0') { size++; }
-    if (size < n) throw std::invalid_argument("Incorrect Input");
-    size = n;
-    capacity = (n / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
+    while (s[size] != '\0') { size++; }
+    capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     data = new char[capacity];
-    for (size_t i = 0; i < n; i++) { data[i] = c_str[i]; }
-    data[n] = '\0';
+    
+    for (size_t i = 0; i < size; i++) { data[i] = s[i]; }
+    data[size] = '\0';
+    
     return *this;
 }
 CString& CString::assign(const char* s, size_t n) 
 {
+    size = 0;
+    while (s[size] != '\0') { size++; }
+    if (size < n) throw std::invalid_argument("Incorrect Input");
     size = n;
-    capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
+    capacity = (n / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     data = new char[capacity];
-    for (size_t i = 0; i < size; i++) { data[i] = c; }
-    data[size] = '\0';
+    
+    for (size_t i = 0; i < n; i++) { data[i] = s[i]; }
+    data[n] = '\0';
+    
     return *this;
 }
 CString& CString::assign(size_t n, char c) 
 {
-    if (len + pos > str.size) { throw std::invalid_argument("unmatching size for CString imput"); }
-    size = len;
+    size = n;
     capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     data = new char[capacity];
-    for (size_t i = 0; i < size; i++) { data[i] = str.data[pos + i]; }
+    
+    for (size_t i = 0; i < size; i++) { data[i] = c; }
     data[size] = '\0';
+   
     return *this;
 }
 
@@ -234,24 +259,18 @@ void CString::resize(size_t n)
     size_t tempS = size; 
     size = n;
     if (n > capacity) capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
-    if (size > tempS) { for (size_t i = tempS; i < size; i++) { data[i] = ' '; } }
+    if (size > tempS) for (size_t i = tempS; i < size; i++)  data[i] = ' '; 
     data[size] = '\0';
 }
 void CString::reserve(size_t n) 
 {
-    if (n > size) 
-    {
-        capacity = (n / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
-    }
-    else 
-    {
-        throw std::invalid_argument("The sated value is too small.");
-    }   
+    if (n > size)  capacity = (n / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
+    else throw std::invalid_argument("The sated value is too small."); 
 }
 
 void CString::push_back(char c) 
 {
-    if (this->full()) { this->reserve(capacity); }
+    if (this->full()) this->reserve(capacity);
 
     data[size] = c;
     data[++size] = '\0';
@@ -268,14 +287,14 @@ void CString::pop_back()
 
 CString& CString::erase(size_t pos, size_t len) 
 {
-    if (len + pos > size) { throw std::invalid_argument("unmatching size for CString imput"); }
+    if (len + pos > size) throw std::invalid_argument("unmatching size for CString imput");
 
     CString SubTemp;
     SubTemp.size = size;
     SubTemp.capacity = (SubTemp.size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     size_t i = 0;
 
-    for (i; i < size; i++) { if (!(i >= pos && i <= pos + len)) { SubTemp.data[i] = data[i]; } }
+    for (i; i < size; i++) if (!(i >= pos && i <= pos + len)) SubTemp.data[i] = data[i];
     SubTemp.size = size - len;
     SubTemp.capacity = (SubTemp.size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     SubTemp.data[SubTemp.size] = '\0';
@@ -285,22 +304,24 @@ CString& CString::erase(size_t pos, size_t len)
 
 CString& CString::append(const CString& str) 
 {
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
     size_t temp = size;
     size += str.size;
 
-    for (size_t i = 0; i < str.size; i++) { data[temp + i] = str.data[i]; }
+    for (size_t i = 0; i < str.size; i++) data[temp + i] = str.data[i];
     data[size] = '\0';
     if (this->full() || this->overflow()) capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     return *this;
 }
 CString& CString::append(const CString& str, size_t subpos, size_t sublen) 
 {
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
     CString str_2 = str.substr(subpos, sublen);
     
     size_t temp = size;
     size += str_2.size;
 
-    for (size_t i = 0; i < str_2.size; i++) { data[temp + i] = str_2.data[i]; }
+    for (size_t i = 0; i < str_2.size; i++) data[temp + i] = str_2.data[i];
     data[size] = '\0';
     if (this->full() || this->overflow()) capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     return *this;
@@ -325,7 +346,8 @@ CString& CString::append(const char* s, size_t n)
     if (this->full() || this->overflow()) capacity = (size / STEP_CAPACITY) * STEP_CAPACITY + STEP_CAPACITY;
     return *this;
 }
-CString& CString::append(size_t n, char c) {
+CString& CString::append(size_t n, char c) 
+{
     size_t temp = size;
     size += n;
 
@@ -337,7 +359,8 @@ CString& CString::append(size_t n, char c) {
 
 CString& CString::insert(size_t pos, const CString& str) 
 {
-    if (pos > size) { throw std::invalid_argument("unmatching size for CString imput");}
+    if (pos > size) throw std::invalid_argument("unmatching size for CString imput");
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
     
     CString begin(*this, 0, pos);
     CString end(*this, pos, size - pos);
@@ -348,8 +371,8 @@ CString& CString::insert(size_t pos, const CString& str)
 }
 CString& CString::insert(size_t pos, const CString& str, size_t subpos, size_t sublen) 
 {
-    if (pos > size) { throw std::invalid_argument("unmatching size for CString imput"); }
-    if (subpos + sublen > str.size) { throw std::invalid_argument("unmatching size for CString imput"); }
+    if (pos > size) throw std::invalid_argument("unmatching size for CString imput");
+    if (subpos + sublen > str.size) throw std::invalid_argument("unmatching size for CString imput");
 
     CString begin(*this, 0, pos);
     CString end(*this, pos, size - pos);
@@ -362,7 +385,7 @@ CString& CString::insert(size_t pos, const CString& str, size_t subpos, size_t s
 }
 CString& CString::insert(size_t pos, const char* s) 
 {
-    if (pos > size) { throw std::invalid_argument("unmatching size for CString imput"); }
+    if (pos > size) throw std::invalid_argument("unmatching size for CString imput");
 
     CString begin(*this, 0, pos);
     CString end(*this, pos, size - pos);
@@ -376,7 +399,7 @@ CString& CString::insert(size_t pos, const char* s)
 }
 CString& CString::insert(size_t pos, const char* s, size_t n) 
 {
-    if (pos > size) { throw std::invalid_argument("unmatching size for CString imput"); }
+    if (pos > size) throw std::invalid_argument("unmatching size for CString imput");
 
     CString begin(*this, 0, pos);
     CString end(*this, pos, size - pos);
@@ -389,7 +412,7 @@ CString& CString::insert(size_t pos, const char* s, size_t n)
 }
 CString& CString::insert(size_t pos, size_t n, char c) 
 {
-    if (pos > size) { throw std::invalid_argument("unmatching size for CString imput"); }
+    if (pos > size) throw std::invalid_argument("unmatching size for CString imput");
 
     CString begin(*this, 0, pos);
     CString end(*this, pos, size - pos);
@@ -403,38 +426,47 @@ CString& CString::insert(size_t pos, size_t n, char c)
 
 CString& CString::replace(size_t pos, size_t len, const CString& str) 
 {
-    if (len + pos > this->size) { throw std::invalid_argument("unmatching size for CString imput"); }
-    for (size_t i = 0; i < len; i++) { this->data[pos + i] = str.data[i]; }
-    return *this;
-}
-CString& CString::replace(size_t pos, size_t len, const CString& str, size_t subpos, size_t sublen) {
+    if (len + pos > this->size) throw std::invalid_argument("unmatching size for CString imput");
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
     
-    if (len + pos > this->size || subpos + sublen > str.size) { throw std::invalid_argument("unmatching size for CString imput"); }
+    for (size_t i = 0; i < len; i++) this->data[pos + i] = str.data[i];
+    return *this;
+}
+CString& CString::replace(size_t pos, size_t len, const CString& str, size_t subpos, size_t sublen) 
+{
+    
+    if (len + pos > this->size || subpos + sublen > str.size) throw std::invalid_argument("unmatching size for CString imput");
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
+    
     CString Temp = str.substr(subpos, sublen);
-    for (size_t i = 0; i < len; i++) { this->data[pos + i] = Temp.data[i]; }
+    
+    for (size_t i = 0; i < len; i++) this->data[pos + i] = Temp.data[i];
     return *this;
 }
-CString& CString::replace(size_t pos, size_t len, const char* s, size_t n) {
-    if (len + pos > this->size) { throw std::invalid_argument("unmatching size for CString imput"); }
-    for (size_t i = 0; i < algorithms::min(this->size, n); i++) { this->data[pos + i] = s[i]; }
+CString& CString::replace(size_t pos, size_t len, const char* s, size_t n) 
+{
+    if (len + pos > this->size) throw std::invalid_argument("unmatching size for CString imput");
+    for (size_t i = 0; i < algorithms::min(this->size, n); i++) this->data[pos + i] = s[i];
     return *this;
 }
-CString& CString::replace(size_t pos, size_t len, size_t n, char c) {
-    if (len + pos > this->size) { throw std::invalid_argument("unmatching size for CString imput"); }
-    for (size_t i = 0; i < len; i++) { this->data[pos + i] = c; }
+CString& CString::replace(size_t pos, size_t len, size_t n, char c) 
+{
+    if (len + pos > this->size) throw std::invalid_argument("unmatching size for CString imput");
+    for (size_t i = 0; i < len; i++) this->data[pos + i] = c;
     return *this;
 }
 
 size_t CString::find(const CString& str) const 
 {   
     size_t pos = 0;
-    if (str.empty()) { throw std::invalid_argument("The CString data is empty"); }
-    for (size_t i = 0, j = 0; i < size && j < str.size;) {
+    if (str.empty()) throw std::invalid_argument("The CString data is empty");
+    
+    for (size_t i = 0, j = 0; i < size && j < str.size;) 
+    {
         if (data[i] == str.data[j])
         {
             if (j == 0) pos = i;
-            j++; i++;
-            
+            j++; i++;  
         }
         else { j = 0; i++; }
     }
@@ -445,15 +477,14 @@ size_t CString::find(const char* s) const
 {
     size_t pos = 0;
     size_t ssize;
-    while (s[ssize] != '\0') { ssize++; }
-
+    while (s[ssize] != '\0') ssize++;
     
-    for (size_t i = 0, j = 0; i < size && j < ssize;) {
+    for (size_t i = 0, j = 0; i < size && j < ssize;) 
+    {
         if (data[i] == s[j])
         {
             if (j == 0) pos = i;
             j++; i++;
-
         }
         else { j = 0; i++; }
     }
@@ -467,12 +498,12 @@ size_t CString::find(const char* s, size_t n) const
     if (n > ssize) throw std::invalid_argument("Incorrect imput");
     ssize = n;
 
-    for (size_t i = 0, j = 0; i < size && j < n;) {
+    for (size_t i = 0, j = 0; i < size && j < n;) 
+    {
         if (data[i] == s[j])
         {
             if (j == 0) pos = i;
             j++; i++;
-
         }
         else { j = 0; i++; }
     }
@@ -481,19 +512,110 @@ size_t CString::find(const char* s, size_t n) const
 size_t CString::find(char c) const 
 {
     size_t pos = 0;
-    for (size_t i = 0; i < size; i++) {
-        if (data[i] == c) pos = i;
-    }
+    for (size_t i = 0; i < size; i++) { if (data[i] == c) pos = i; }
     return pos;
 }
 
-size_t CString::find_first_of(const CString& str) const {
-    for (size_t i = 0; i < size; i++) {
-        for (size_t j = 0; j < str.size; j++) {
-            if (data[i] == str.data[j]) {
-                return i;
-            }
-        }
+size_t CString::find_first_of(const CString& str) const 
+{
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
+    
+    for (size_t i = 0; i < size; i++) 
+    {
+        for (size_t j = 0; j < str.size; j++) { if (data[i] == str.data[j]) { return i; } }
     }
+    return -1;
+}
+size_t CString::find_first_of(const char* s) const 
+{
+    size_t fsize = 0;
+    while (s[fsize] != '\0') fsize++;
+    
+    for (size_t i = 0; i < size; i++) 
+    {
+        for (size_t j = 0; j < fsize; j++) { if (data[i] == s[j]) { return i; } }
+    }
+    return -1;
+}
+size_t CString::find_first_of(const char* s, size_t n) const 
+{
+    size_t fsize = 0;
+    while (s[fsize] != '\0') fsize++;
+    if (n > fsize) throw std::invalid_argument("Incorrect imput.");
+
+    for (size_t i = 0; i < size; i++) 
+    {
+        for (size_t j = 0; j < n; j++) { if (data[i] == s[j]) { return i; } }
+    }
+    return -1;
+}
+size_t CString::find_first_of(char c) const 
+{
+    for (size_t i = 0; i < size; i++) { if (data[i] == c) { return i; }}
+    return -1;
+}
+
+size_t CString::find_first_not_of(const CString& str) const 
+{
+    if (str.empty()) throw std::invalid_argument("unmatching size for CString imput");
+    
+    size_t pos = -1;
+    bool found_not  = 1;
+    
+    for (size_t i = 0; i < size; i++) 
+    {
+        size_t count = 0;
+        do
+        {
+            if (str.data[count] == data[i]) { found_not = 0; }
+            count++;
+        } while (count < str.size);
+        if (found_not) return pos = i;
+    }
+    return -1;
+}
+size_t CString::find_first_not_of(const char* s) const 
+{
+    size_t pos = -1;
+    size_t len;
+    while (s[len] != '/0') len++;
+
+    bool found_not = 1;
+
+    for (size_t i = 0; i < size; i++) 
+    {
+        size_t count = 0;
+        do
+        {
+            if (s[count] == data[i]) { found_not = 0; }
+            count++;
+        } while (count < len);
+        if (found_not) return pos = i;
+    }
+    return -1;
+}
+size_t CString::find_first_not_of(const char* s, size_t n) const 
+{
+    size_t pos = -1;
+    size_t len;
+    while (s[len] != '/0') len++;
+    if (n > len) throw std::invalid_argument("unmatching size for CString imput");
+    bool found_not = 1;
+
+    for (size_t i = 0; i < size; i++) 
+    {
+        size_t count = 0;
+        do
+        {
+            if (s[count] == data[i]) { found_not = 0; }
+            count++;
+        } while (count < n);
+        if (found_not) return pos = i;
+    }
+    return -1;
+}
+size_t CString::find_first_not_of(char c) const 
+{
+    for (size_t i = 0; i < size; i++) if (data[i] != c) return i;
     return -1;
 }
