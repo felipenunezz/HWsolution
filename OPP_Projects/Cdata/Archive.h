@@ -54,6 +54,7 @@ public:
     void pop_front();
 
     TArchive& insert(const T* arr, size_t n, size_t pos);
+    TArchive& insert(const TArchive& archive, size_t pos);
     TArchive& insert(T value, size_t pos);
 
     TArchive& replace(size_t pos, T new_value);
@@ -64,9 +65,9 @@ public:
     TArchive& remove_last(T value);
     TArchive& remove_by_index(size_t pos);
 
-    size_t* find_all(T value) const noexcept;
-    size_t find_first(T value);
-    size_t find_last(T value);
+    size_t* find_all(T value);
+    size_t* find_first(T value);
+    size_t* find_last(T value);
 private:
     size_t count_value(T value);
 };
@@ -237,7 +238,7 @@ TArchive<T>& TArchive<T>::assign(const TArchive& archive)
 template <typename T>
 void  TArchive<T>::clear()
 {
-	delete[] data;
+    delete[] data;
 	delete[] states;
 
 	size = 0;
@@ -245,7 +246,7 @@ void  TArchive<T>::clear()
 	deleted = 0;
 	data = new T[capacity];
 	states = new State[capacity];
-	for (size_t i = 0; i < size; i++) { states[i] = State::empty; }
+	for (size_t i = 0; i < STEP_CAPACITY; i++) { states[i] = State::empty; }
 }
 template <typename T>
 void TArchive<T>::resize(size_t n, T value)
@@ -268,6 +269,7 @@ void TArchive<T>::push_back(T value)
 	if (this->full()) this->reserve(capacity);
 
 	data[size] = value;
+	states[size] = State::busy;
 	data[++size] = '\0';
 }
 template <typename T>
@@ -278,9 +280,28 @@ void TArchive<T>::pop_back()
 }
 
 template <typename T>
-void TArchive<T>::push_front(T value) {}
+void TArchive<T>::push_front(T value) 
+{
+	TArchive<T> archive(*this);
+	if (this->full()) this->reserve(capacity);
+	size++;
+	if (states[0] != State::empty) {
+		for (size_t i = 1; i <= size; i++) { this->data[i] = archive.data[i - 1]; }
+	}
+	states[0] = busy;
+	data[0] = value;
+
+	states[size - 1] = busy;
+	data[size] = '\0';
+}
 template <typename T>
-void TArchive<T>::pop_front() {}
+void TArchive<T>::pop_front() 
+{
+	TArchive<T> archive(*this);
+	if (this->empty()) { throw std::logic_error("Error in function \"void pop_front()\": source CString is empty"); }
+    for (size_t i = 0; i < size; i++) { this->data[i] = archive.data[i + 1]; }
+	data[size--] = '\0';	
+}
 
 template <typename T>
 TArchive<T>& TArchive<T>::insert(const T* arr, size_t n, size_t pos)
@@ -317,6 +338,18 @@ TArchive<T>& TArchive<T>::insert(T value, size_t pos)
 	size++;
 	return *this;
 }
+template <typename T>
+TArchive<T>& TArchive<T>::insert(const TArchive<T>& archive, size_t pos) {
+	if (size < pos) { throw std::logic_error("Error in function \"TArchive<T>& insert(T value, size_t pos)\": wrong position value."); }
+	if (archive.empty()) { throw std::logic_error("Error in function \"TArchive<T>& insert(T value, size_t pos)\": Archive was empty."); }
+	if (this->full()) { this->reserve(size + archive.size); }
+	size += archive.size; 
+
+	for (size_t i = size; i > pos; i--) { data[i] = data[i - archive.size]; states[i] = states[i - archive.size];}
+	for (size_t i = 0; i < archive.size; i++) { data[pos + i] = archive.data[i]; states[pos + i] = State::busy; }
+	
+	return *this;
+}
 
 template <typename T>
 TArchive<T>& TArchive<T>::replace(size_t pos, T new_value)
@@ -333,7 +366,7 @@ TArchive<T>& TArchive<T>::erase(size_t pos, size_t n)
 
 	for (size_t i = 0; i < n; i++)
 	{
-		data[pos + i] = nullptr;
+		data[pos + i] = NULL;
 		states[pos + i] = State::deleted;
 		deleted++;
 	}
@@ -350,12 +383,9 @@ TArchive<T>& TArchive<T>::remove_all(T value)
 
 	for (size_t i = 1; i < pos[0]; i++)
 	{
-		if (data[pos[i]])
-		{
-			if (pos[i] == size) { states[pos[i]] = State::empty; }
-			else states[pos[i]] = State::deleted;
-			deleted++;
-		}
+		if (pos[i] == size) { states[size] = State::empty; }
+		else { states[pos[i]] = State::deleted; }
+		deleted++;
 	}
 
 	return *this;
@@ -365,11 +395,11 @@ TArchive<T>& TArchive<T>::remove_first(T value)
 {
 	if (this->empty()) throw std::logic_error("Error in function \"TArchive<T>& TArchive<T>::remove_first(T value)\": Archive is empty.");
 
-	size_t pos = this->find_first(value);
+	size_t* pos = this->find_first(value);
 	if (pos == nullptr) throw std::logic_error("Error in function \"TArchive<T>& TArchive<T>::remove_first(T value)\": position is not found.");
 
-	if (pos == size) states[pos] = State::empty;
-	else states[pos] = State::deleted;
+	if (pos[1] == size) states[size] = State::empty;
+	else states[pos[1]] = State::deleted;
 	deleted++;
 
 	return *this;
@@ -379,11 +409,11 @@ TArchive<T>& TArchive<T>::remove_last(T value)
 {
 	if (this->empty()) throw std::logic_error("Error in function \"TArchive<T>& TArchive<T>::remove_last(T value)\": Archive is empty.");
 
-	size_t pos = this->find_last(value);
+	size_t* pos = this->find_last(value);
 	if (pos == nullptr) throw std::logic_error("Error in function \"TArchive<T>& TArchive<T>::remove_last(T value)\": position is not found.");
 
-	if (pos == size) states[pos] = State::empty;
-	else states[pos] = State::deleted;
+	if (pos[1] == size) states[size] = State::empty;
+	else states[pos[1]] = State::deleted;
 	deleted++;
 
 	return *this;
@@ -401,11 +431,11 @@ TArchive<T>& TArchive<T>::remove_by_index(size_t pos)
 }
 
 template <typename T>
-size_t* TArchive<T>::find_all(T value) const noexcept
+size_t* TArchive<T>::find_all(T value)
 {
 	size_t count = this->count_value(value);
 	if (count == 0) { return nullptr; }
-	int* found_positions = new int[count + 1];
+	size_t* found_positions = new size_t[count + 1];
 	found_positions[0] = count;
 
 	for (size_t i = 0, j = 1; j < count + 1; i++)
@@ -416,33 +446,33 @@ size_t* TArchive<T>::find_all(T value) const noexcept
 	return found_positions;
 }
 template <typename T>
-size_t TArchive<T>::find_first(T value)
+size_t* TArchive<T>::find_first(T value)
 {
-	size_t pos = nullptr;
+	size_t* found_positions = new size_t[2];
 	for (size_t i = 0; i < size; i++)
 	{
-		if (data[i] == value) { return pos = i; }
+		if (data[i] == value) { found_positions[1] = i; found_positions[0]++; return found_positions; }
 	}
-	return pos;
+	return found_positions;
 }
 template <typename T>
-size_t TArchive<T>::find_last(T value)
+size_t* TArchive<T>::find_last(T value)
 {
-	size_t pos = nullptr;
+	size_t* found_positions = new size_t[2];
 	for (size_t i = size; i > 0; i--)
 	{
-		if (data[i] == value) { return pos = i; }
+		if (data[i] == value) { found_positions[1] = i; found_positions[0] ++; return found_positions; }
 	}
-	return pos;
+	return found_positions;
 }
 
 template <typename T>
 size_t TArchive<T>::count_value(T value)
 {
 	size_t count = 0;
-	for (size_t i; i < size; i++)
+	for (size_t i = 0; i <= this->size; i++)
 	{
-		if (data[i] == value) count++;
+		if (this->data[i] == value) count++;
 	}
 	return count;
 }
