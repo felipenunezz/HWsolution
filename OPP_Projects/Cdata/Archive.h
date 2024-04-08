@@ -381,7 +381,7 @@ TArchive<T>& TArchive<T>::remove_all(T value)
 	size_t* pos = find_all(value);
 	if (pos == nullptr) throw std::logic_error("Error in function \"TArchive<T>& TArchive<T>::remove_all(T value)\": No matching value found.");
 
-	for (size_t i = 1; i < pos[0]; i++)
+	for (size_t i = 1; i <= pos[0]; i++)
 	{
 		if (pos[i] == size) { states[size] = State::empty; }
 		else { states[pos[i]] = State::deleted; }
