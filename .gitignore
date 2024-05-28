@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/OPP_Projects/WindowsFormsApp1
+/OPP_Projects/WindowsFormsApp2
